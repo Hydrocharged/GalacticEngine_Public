@@ -1,0 +1,42 @@
+material {
+    name : rmlUi,
+    parameters : [
+        {
+            type : sampler2d,
+            name : albedo
+        },
+        {
+            type : float4x4,
+            name : transform
+        },
+        {
+            type : float2,
+            name : translation
+        }
+    ],
+    requires : [
+        uv0,
+        color
+    ],
+    shadingModel : unlit,
+    culling : none,
+    depthCulling: false,
+    blending : transparent,
+    flipUV : false
+}
+
+vertex {
+    void materialVertex(inout MaterialVertexInputs material) {
+        material.worldPosition = materialParams.transform * vec4(getPosition().xy + materialParams.translation.xy, 0.0, 1.0);
+    }
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+	prepareMaterial(material);
+        vec2 uv = getUV0();
+        vec4 albedo = texture(materialParams_albedo, uv);
+        material.baseColor = getColor() * albedo;
+        material.baseColor.rgb *= material.baseColor.a;
+    }
+}
